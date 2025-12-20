@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --arctic-900: 220 25% 4%;
+  --arctic-800: 220 20% 8%;
+  --arctic-700: 220 15% 12%;
+  --primary: 168 76% 59%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 189 94% 55%;
+  --accent-foreground: 0 0% 100%;
+  --foreground: 0 0% 98%;
+  --muted: 220 15% 25%;
+  --muted-foreground: 220 10% 60%;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: hsl(var(--arctic-900));
+  color: hsl(var(--foreground));
+  font-family: var(--font-syne), system-ui, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
