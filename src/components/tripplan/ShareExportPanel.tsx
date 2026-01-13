@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { TripPlan } from '@/types/trip';
+import { generateICS, generatePDF, generateShareableLink, downloadFile } from '@/lib/services/export';
 
 interface ShareExportPanelProps {
   plan: TripPlan;
@@ -11,15 +12,41 @@ interface ShareExportPanelProps {
 export function ShareExportPanel({ plan }: ShareExportPanelProps) {
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      // Generate shareable link
+      setGenerating(true);
+      const shareableLink = await generateShareableLink(plan);
+      await navigator.clipboard.writeText(shareableLink);
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
     } catch (error) {
       console.error('Failed to copy link:', error);
       alert('Kunne ikke kopiere lenke. Prøv igjen.');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const exportToCalendar = () => {
+    try {
+      const icsContent = generateICS(plan);
+      downloadFile(icsContent, 'tromso-trip.ics', 'text/calendar');
+    } catch (error) {
+      console.error('Failed to export calendar:', error);
+      alert('Kunne ikke eksportere til kalender. Prøv igjen.');
+    }
+  };
+
+  const exportToPDF = () => {
+    try {
+      const pdfBlob = generatePDF(plan);
+      downloadFile(pdfBlob, 'tromso-trip-plan.pdf', 'application/pdf');
+    } catch (error) {
+      console.error('Failed to export PDF:', error);
+      alert('Kunne ikke eksportere PDF. Prøv igjen.');
     }
   };
 
@@ -163,6 +190,59 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
         </button>
       </div>
 
+      {/* Export Options */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Export to Calendar */}
+        <button
+          onClick={exportToCalendar}
+          className={cn(
+            'flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all',
+            'hover:border-primary/50 hover:bg-arctic-700/50',
+            'border-arctic-700 bg-arctic-800'
+          )}
+        >
+          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div className="text-center">
+            <div className="font-semibold mb-1">Eksporter til kalender</div>
+            <div className="text-xs text-muted-foreground">Last ned .ics fil</div>
+          </div>
+        </button>
+
+        {/* Export to PDF */}
+        <button
+          onClick={exportToPDF}
+          className={cn(
+            'flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all',
+            'hover:border-primary/50 hover:bg-arctic-700/50',
+            'border-arctic-700 bg-arctic-800'
+          )}
+        >
+          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div className="text-center">
+            <div className="font-semibold mb-1">Last ned PDF</div>
+            <div className="text-xs text-muted-foreground">Fullt detaljert turplan</div>
+          </div>
+        </button>
+      </div>
+
       {/* Coming Soon */}
       <div className="bg-arctic-800/50 rounded-2xl p-6 border border-arctic-700 border-dashed">
         <h4 className="font-semibold mb-2 flex items-center gap-2">
@@ -176,7 +256,7 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
           </li>
           <li className="flex items-center gap-2">
             <span className="text-primary">•</span>
-            Eksporter til kalender (.ics, Google Calendar)
+            Direkte booking av aktiviteter og restauranter
           </li>
           <li className="flex items-center gap-2">
             <span className="text-primary">•</span>
