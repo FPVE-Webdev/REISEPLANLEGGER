@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Syne } from 'next/font/google';
 import './globals.css';
+import RootLayoutClient from './layout-client';
 
 const syne = Syne({
   subsets: ['latin'],
@@ -18,10 +19,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="no" className={syne.variable}>
       <body className="font-sans antialiased">
-        {children}
+        <RootLayoutClient>{children}</RootLayoutClient>
       </body>
     </html>
   );
