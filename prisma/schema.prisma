@@ -1,0 +1,219 @@
+// Prisma Schema for Tripplan Tromsø
+// PostgreSQL database on Supabase
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Core Models
+// ============================================
+
+model POI {
+  id                  String    @id @default(cuid())
+  name                String
+  nameNo              String
+  category            String
+  description         String
+  descriptionNo       String
+
+  // Location
+  latitude            Float
+  longitude           Float
+  address             String
+
+  // Availability
+  seasons             String[]  // stored as JSON array
+  openingHours        Json?
+
+  // Pricing
+  priceLevel          String    // 'free' | 'low' | 'medium' | 'high'
+  estimatedCost       Int       // NOK
+
+  // External integrations
+  checkfrontItemId    String?
+  googlePlaceId       String?
+  bookingUrl          String?
+
+  // AI weights
+  pilarType           String?   // 'featured' | 'essential'
+  featuredPilar       String?
+  essentialThemes     String[]  // stored as JSON array
+  aiWeight            Int       @default(5) // 1-10
+
+  // Metadata
+  imageUrl            String?
+  website             String?
+  phone               String?
+  email               String?
+
+  // Activity-specific
+  duration            Int?      // minutes
+  bookingRequired     Boolean   @default(false)
+  cancellationPolicy  String?
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Relations
+  checkfrontItems     CheckfrontItem[]
+  restaurantBookings  RestaurantBooking[]
+
+  @@index([category])
+  @@index([priceLevel])
+  @@index([aiWeight])
+}
+
+model CheckfrontItem {
+  id                  String    @id @default(cuid())
+  itemId              String    @unique
+  poiId               String
+  poi                 POI       @relation(fields: [poiId], references: [id], onDelete: Cascade)
+
+  name                String
+  category            String
+  price               Float
+  currency            String    @default("NOK")
+
+  lastSynced          DateTime  @default(now())
+
+  availability        CheckfrontAvailability[]
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([poiId])
+}
+
+model CheckfrontAvailability {
+  id                  String    @id @default(cuid())
+  checkfrontItemId    String
+  checkfrontItem      CheckfrontItem @relation(fields: [checkfrontItemId], references: [id], onDelete: Cascade)
+
+  date                String    // YYYY-MM-DD
+  time                String    // HH:MM
+  available           Boolean   @default(true)
+  price               Float
+  capacity            Int
+  booked              Int       @default(0)
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([checkfrontItemId])
+  @@index([date])
+}
+
+model RestaurantBooking {
+  id                  String    @id @default(cuid())
+  poiId               String
+  poi                 POI       @relation(fields: [poiId], references: [id], onDelete: Cascade)
+
+  restaurantName      String
+  bookingPlatform     String    // 'opentable' | 'quandoo' | 'resdiary' | 'google-places'
+  externalId          String
+
+  lastSynced          DateTime  @default(now())
+
+  availability        RestaurantAvailability[]
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([poiId])
+  @@index([bookingPlatform])
+}
+
+model RestaurantAvailability {
+  id                  String    @id @default(cuid())
+  restaurantBookingId String
+  restaurantBooking   RestaurantBooking @relation(fields: [restaurantBookingId], references: [id], onDelete: Cascade)
+
+  date                String    // YYYY-MM-DD
+  time                String    // HH:MM
+  available           Boolean   @default(true)
+  partySize           Int
+
+  createdAt           DateTime  @default(now())
+
+  @@index([restaurantBookingId])
+  @@index([date])
+}
+
+// ============================================
+// Trip Planning Models
+// ============================================
+
+model TripPlan {
+  id                  String    @id @default(cuid())
+  shareableId         String    @unique @default(cuid()) // for shareable links
+
+  preferences         Json      // TripPreferences from frontend
+  plan                Json      // TripPlan response
+
+  expiresAt           DateTime  @default(dbgenerated("now() + interval '7 days'"))
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([shareableId])
+  @@index([expiresAt])
+}
+
+// ============================================
+// Configuration Models
+// ============================================
+
+model PilarConfig {
+  id                  String    @id @default(cuid())
+  type                String    // 'featured' | 'essential'
+  name                String
+  description         String
+  weight              Int       // 1-10
+  associatedPOIs      String[]  // POI IDs stored as JSON array
+  essentialTheme      String?
+  featuredPilar       String?
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([type])
+}
+
+model SeasonConfig {
+  id                  String    @id @default(cuid())
+  season              String    @unique // 'summer' | 'winter' | 'polar-night'
+  name                String
+  nameNo              String
+  startMonth          Int       // 1-12
+  endMonth            Int       // 1-12
+  description         String
+  highlights          String[]  // stored as JSON array
+  weatherInfo         String
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+// ============================================
+// Category Reference
+// ============================================
+
+model Category {
+  id                  String    @id @default(cuid())
+  categoryId          String    @unique // 'museums', 'galleries', etc.
+  name                String
+  nameNo              String
+  description         String
+  icon                String
+  sortOrder           Int
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
