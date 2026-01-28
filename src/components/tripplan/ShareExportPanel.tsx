@@ -40,13 +40,16 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
     }
   };
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     try {
-      const pdfBlob = generatePDF(plan);
+      setGenerating(true);
+      const pdfBlob = await generatePDF(plan);
       downloadFile(pdfBlob, 'tromso-trip-plan.pdf', 'application/pdf');
     } catch (error) {
       console.error('Failed to export PDF:', error);
       alert('Kunne ikke eksportere PDF. Prøv igjen.');
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -220,25 +223,40 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
         {/* Export to PDF */}
         <button
           onClick={exportToPDF}
+          disabled={generating}
           className={cn(
             'flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all',
             'hover:border-primary/50 hover:bg-arctic-700/50',
-            'border-arctic-700 bg-arctic-800'
+            'border-arctic-700 bg-arctic-800',
+            generating && 'opacity-50 cursor-not-allowed'
           )}
         >
           <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-              />
-            </svg>
+            {generating ? (
+              <svg className="w-6 h-6 text-primary animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+            )}
           </div>
           <div className="text-center">
-            <div className="font-semibold mb-1">Last ned PDF</div>
-            <div className="text-xs text-muted-foreground">Fullt detaljert turplan</div>
+            <div className="font-semibold mb-1">{generating ? 'Genererer...' : 'Last ned PDF'}</div>
+            <div className="text-xs text-muted-foreground">
+              {generating ? 'Vennligst vent' : 'Fullt detaljert turplan'}
+            </div>
           </div>
         </button>
       </div>

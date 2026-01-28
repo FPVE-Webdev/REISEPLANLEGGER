@@ -58,72 +58,222 @@ export async function generateShareableLink(plan: TripPlan): Promise<string> {
 }
 
 /**
- * Generate PDF of trip plan
- * This will be implemented using jsPDF or similar library
+ * Generate PDF of trip plan using jsPDF
  */
-export function generatePDF(plan: TripPlan): Blob {
-  // TODO: Implement PDF generation with jsPDF
-  // For now, return a placeholder
+export async function generatePDF(plan: TripPlan): Promise<Blob> {
+  const jsPDF = (await import('jspdf')).jsPDF;
 
-  const pdfContent = generatePDFContent(plan);
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  });
 
-  // Create a simple text file as placeholder
-  const blob = new Blob([pdfContent], { type: 'text/plain' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 15;
+  const contentWidth = pageWidth - 2 * margin;
+  let yPosition = margin;
 
-  return blob;
-}
+  // Color scheme
+  const primaryColor: [number, number, number] = [100, 150, 255]; // Blue
+  const darkColor: [number, number, number] = [40, 40, 40]; // Dark gray
+  const lightColor: [number, number, number] = [200, 200, 200]; // Light gray
 
-/**
- * Generate PDF content as formatted text
- * TODO: Replace with actual PDF library (jsPDF)
- */
-function generatePDFContent(plan: TripPlan): string {
-  let content = `TROMSØ TRIP PLAN\n`;
-  content += `Generated: ${new Date().toLocaleDateString('no-NO')}\n\n`;
-  content += `${plan.summary}\n\n`;
-  content += `Total Cost: ${plan.totalCost} NOK\n\n`;
-  content += `---\n\n`;
+  // Helper function to add text with wrapping
+  const addText = (text: string, size: number, isBold = false, color: [number, number, number] = darkColor): number => {
+    doc.setFontSize(size);
+    doc.setFont('Helvetica', isBold ? 'bold' : 'normal');
+    doc.setTextColor(color[0], color[1], color[2]);
 
+    const lines = doc.splitTextToSize(text, contentWidth);
+    doc.text(lines, margin, yPosition);
+
+    const lineHeight = size * 0.35;
+    return lines.length * lineHeight;
+  };
+
+  // Helper function to check if we need a new page
+  const checkNewPage = (height: number) => {
+    if (yPosition + height > pageHeight - margin) {
+      doc.addPage();
+      yPosition = margin;
+    }
+  };
+
+  // Title
+  checkNewPage(20);
+  yPosition += addText('TROMSØ TRIPPLAN', 24, true, primaryColor);
+  yPosition += 3;
+
+  // Destination and dates
+  checkNewPage(10);
+  yPosition += addText(plan.summary, 12, false, darkColor);
+  yPosition += 3;
+
+  // Generated date
+  checkNewPage(5);
+  doc.setFontSize(9);
+  doc.setTextColor(150, 150, 150);
+  doc.text(`Generert: ${new Date().toLocaleDateString('no-NO')}`, margin, yPosition);
+  yPosition += 5;
+
+  // Separator
+  doc.setDrawColor(lightColor[0], lightColor[1], lightColor[2]);
+  doc.line(margin, yPosition, pageWidth - margin, yPosition);
+  yPosition += 5;
+
+  // Days
   plan.days.forEach((day) => {
-    content += `DAY ${day.day} - ${day.theme}\n`;
-    content += `Date: ${new Date(day.date).toLocaleDateString('no-NO')}\n\n`;
+    checkNewPage(15);
 
+    // Day header
+    yPosition += addText(`DAG ${day.day} - ${day.theme}`, 14, true, primaryColor);
+    yPosition += 1;
+
+    // Date
+    doc.setFontSize(10);
+    doc.setFont('Helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(`${new Date(day.date).toLocaleDateString('no-NO')}`, margin, yPosition);
+    yPosition += 5;
+
+    // Activities
     day.activities.forEach((activity) => {
-      content += `${activity.time} - ${activity.title}\n`;
-      content += `  Location: ${activity.location}\n`;
-      content += `  Duration: ${activity.duration}\n`;
-      content += `  Cost: ${activity.cost} NOK\n`;
-      content += `  ${activity.description}\n\n`;
+      checkNewPage(8);
+
+      // Activity time and title
+      doc.setFontSize(10);
+      doc.setFont('Helvetica', 'bold');
+      doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
+      doc.text(`${activity.time} - ${activity.title}`, margin, yPosition);
+      yPosition += 4;
+
+      // Activity details
+      doc.setFontSize(9);
+      doc.setFont('Helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+
+      const details = [
+        `Sted: ${activity.location}`,
+        `Varighet: ${activity.duration}`,
+        `Kostnad: ${activity.cost} NOK`,
+      ];
+
+      details.forEach((detail) => {
+        doc.text(detail, margin + 5, yPosition);
+        yPosition += 3;
+      });
+
+      // Description
+      const descLines = doc.splitTextToSize(activity.description, contentWidth - 5);
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(descLines, margin + 5, yPosition);
+      yPosition += descLines.length * 2.5 + 2;
     });
 
+    // Dining
     if (day.dining.lunch || day.dining.dinner) {
-      content += `DINING:\n`;
-      if (day.dining.lunch) content += `  Lunch: ${day.dining.lunch}\n`;
-      if (day.dining.dinner) content += `  Dinner: ${day.dining.dinner}\n`;
-      content += `\n`;
+      checkNewPage(8);
+      yPosition += addText('Målord', 11, true, darkColor);
+      yPosition += 1;
+
+      doc.setFontSize(9);
+      if (day.dining.lunch) {
+        doc.text(`Lunsj: ${day.dining.lunch}`, margin + 5, yPosition);
+        yPosition += 4;
+      }
+      if (day.dining.dinner) {
+        doc.text(`Middag: ${day.dining.dinner}`, margin + 5, yPosition);
+        yPosition += 4;
+      }
+      yPosition += 2;
     }
 
+    // Aurora info
     if (day.aurora) {
-      content += `NORTHERN LIGHTS:\n`;
-      content += `  Probability: ${day.aurora.probability}%\n`;
-      content += `  Best time: ${day.aurora.bestTime}\n`;
-      content += `  Location: ${day.aurora.location}\n\n`;
+      checkNewPage(10);
+      yPosition += addText('🌌 Nordlys Informasjon', 11, true, primaryColor);
+      yPosition += 1;
+
+      doc.setFontSize(9);
+      const auroraDetails = [
+        `Sannsynlighet: ${day.aurora.probability}%`,
+        `Beste tid: ${day.aurora.bestTime}`,
+        `Sted: ${day.aurora.location}`,
+      ];
+
+      auroraDetails.forEach((detail) => {
+        doc.text(detail, margin + 5, yPosition);
+        yPosition += 3;
+      });
+      yPosition += 3;
     }
 
-    content += `---\n\n`;
+    // Day separator
+    doc.setDrawColor(lightColor[0], lightColor[1], lightColor[2]);
+    doc.line(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 5;
   });
 
-  content += `PACKING LIST:\n`;
+  // Packing List
+  checkNewPage(15);
+  yPosition += addText('Pakkelist', 14, true, primaryColor);
+  yPosition += 2;
+
+  doc.setFontSize(9);
+  doc.setTextColor(80, 80, 80);
+
   plan.packingList.forEach((item) => {
-    content += `  - ${item}\n`;
+    if (yPosition + 3 > pageHeight - margin) {
+      doc.addPage();
+      yPosition = margin;
+    }
+    doc.text(`• ${item}`, margin + 5, yPosition);
+    yPosition += 3;
   });
 
-  content += `\nSAFETY NOTES:\n`;
+  yPosition += 3;
+
+  // Safety Notes
+  checkNewPage(15);
+  yPosition += addText('Sikkerhetstips', 14, true, primaryColor);
+  yPosition += 2;
+
+  doc.setFontSize(9);
+  doc.setTextColor(80, 80, 80);
+
   plan.safetyNotes.forEach((note) => {
-    content += `  - ${note}\n`;
+    const noteLines = doc.splitTextToSize(`• ${note}`, contentWidth - 5);
+    if (yPosition + noteLines.length * 3 > pageHeight - margin) {
+      doc.addPage();
+      yPosition = margin;
+    }
+    doc.text(noteLines, margin + 5, yPosition);
+    yPosition += noteLines.length * 3 + 2;
   });
 
-  return content;
+  // Footer
+  yPosition += 5;
+  checkNewPage(8);
+
+  // Total cost
+  doc.setFontSize(12);
+  doc.setFont('Helvetica', 'bold');
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  doc.text(`Totalkostnad: ${plan.totalCost} NOK`, margin, yPosition);
+  yPosition += 6;
+
+  // Footer note
+  doc.setFontSize(8);
+  doc.setTextColor(150, 150, 150);
+  doc.setFont('Helvetica', 'normal');
+  doc.text('Tripplan generert av Tripplan Tromsø', margin, pageHeight - 10);
+
+  // Get PDF as Blob
+  const pdfBlob = doc.output('blob');
+  return pdfBlob;
 }
 
 // Helper functions
