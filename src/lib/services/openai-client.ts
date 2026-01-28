@@ -57,9 +57,9 @@ export async function callOpenAIForTripPlan(
       return null;
     }
 
-    // Call GPT-4 API
+    // Call GPT-4 Turbo API
     const response = await client.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4-turbo',
       max_tokens: maxTokens,
       temperature,
       messages: [
@@ -87,7 +87,7 @@ export async function callOpenAIForTripPlan(
 
     // Log API usage for monitoring
     logOpenAIUsage({
-      model: 'gpt-4',
+      model: 'gpt-4-turbo',
       inputTokens: response.usage?.prompt_tokens || 0,
       outputTokens: response.usage?.completion_tokens || 0,
       totalTokens: response.usage?.total_tokens || 0,

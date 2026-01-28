@@ -23,14 +23,14 @@ export interface AICore {
 }
 
 export const DEFAULT_CONFIGS = {
-  model: 'gpt-4',
+  model: 'gpt-4-turbo',
   temperature: 0.7,
   AURORA_ANALYZER: {
-    model: 'gpt-4',
+    model: 'gpt-4-turbo',
     temperature: 0.7,
   },
   TRIPPLAN_CURATOR: {
-    model: 'gpt-4',
+    model: 'gpt-4-turbo',
     temperature: 0.7,
   },
 };
