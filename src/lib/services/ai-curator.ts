@@ -3,6 +3,7 @@ import type { Season } from '@/types/database';
 import { SEASONS } from '@/lib/constants/seasons';
 import { FEATURED_PILARS, ESSENTIAL_THEMES } from '@/lib/constants/pilars';
 import { callOpenAIForTripPlan } from '@/lib/services/openai-client';
+import { fetchTripPlanningCompanies } from '@/lib/services/company-client';
 
 interface GenerateTripPlanInput {
   preferences: TripPreferences;
@@ -18,7 +19,7 @@ interface GenerateTripPlanInput {
  * - Seasonal context (summer, winter, polar night)
  * - Featured pilars (Fjellheisen, Arctic Cathedral, etc.)
  * - Essential themes (nature, culture, Northern Lights, etc.)
- * - Real-time availability from Checkfront
+ * - Live company data from Supabase (experiences, accommodation, dining)
  * - Restaurant availability
  *
  * Uses GPT-4 API with fallback to rule-based generation if API unavailable
@@ -26,9 +27,20 @@ interface GenerateTripPlanInput {
 export async function generateTripPlan(input: GenerateTripPlanInput): Promise<TripPlan> {
   const { preferences, season, startDate } = input;
 
+  // Fetch live companies data from Supabase (non-blocking)
+  let companiesData = '';
+  try {
+    const companies = await fetchTripPlanningCompanies();
+    if (Object.keys(companies).length > 0) {
+      companiesData = formatCompaniesForPrompt(companies);
+    }
+  } catch (error) {
+    console.warn('[AI Curator] Could not fetch live companies, using fallback:', error);
+  }
+
   // Build AI context and prompts
   const systemPrompt = buildSystemPrompt(preferences, season);
-  const userMessage = buildUserMessage(preferences, startDate);
+  const userMessage = buildUserMessage(preferences, startDate, companiesData);
 
   try {
     // Attempt to generate plan using OpenAI GPT-4
@@ -124,13 +136,18 @@ The JSON structure must match this exact format:
 /**
  * Build user message for OpenAI GPT-4
  * Contains the specific trip requirements and preferences
+ * Includes live company data from Supabase
  */
-function buildUserMessage(preferences: TripPreferences, startDate: Date): string {
+function buildUserMessage(preferences: TripPreferences, startDate: Date, companiesData: string = ''): string {
   const budget = preferences.budget === 'low' ? '800 NOK/dag' :
     preferences.budget === 'medium' ? '1500 NOK/dag' : '3000+ NOK/dag';
 
   const pace = preferences.difficulty === 'easy' ? 'rolig' :
     preferences.difficulty === 'moderate' ? 'moderat' : 'aktivt';
+
+  const companiesSection = companiesData
+    ? `\n\nAVAILABLE VENUES & RESTAURANTS:\n${companiesData}\n`
+    : '';
 
   return `Please create a detailed ${preferences.days}-day itinerary for Tromsø with the following preferences:
 
@@ -154,8 +171,7 @@ REQUIREMENTS:
 6. Respect budget constraints throughout
 7. Optimize routes based on transportation mode
 8. Include practical safety notes and packing recommendations
-9. Weave in Tromsø's unique character and local experiences
-
+9. Weave in Tromsø's unique character and local experiences${companiesSection}
 Create a realistic, bookable itinerary that will be memorable and practical.`;
 }
 
@@ -416,4 +432,33 @@ function generatePackingList(season: Season, preferences: TripPreferences): stri
   }
 
   return items;
+}
+
+/**
+ * Format companies data for inclusion in AI prompt
+ * Converts structured company data into readable format for LLM
+ */
+function formatCompaniesForPrompt(companies: Record<string, any>): string {
+  const sections: string[] = [];
+
+  // Format each category
+  for (const [category, items] of Object.entries(companies)) {
+    if (!Array.isArray(items) || items.length === 0) continue;
+
+    const categoryTitle = category.charAt(0).toUpperCase() + category.slice(1);
+    const formatted = items
+      .slice(0, 10) // Limit to first 10 per category to avoid token bloat
+      .map((item: any) => {
+        const name = item.name || 'Unknown';
+        const description = item.description_short || item.description || '';
+        const pricing = item.pricing?.category || 'N/A';
+        const hours = item.opening_hours ? '(Hours vary)' : '';
+        return `- ${name}: ${description} [Price: ${pricing}] ${hours}`;
+      })
+      .join('\n');
+
+    sections.push(`${categoryTitle}:\n${formatted}`);
+  }
+
+  return sections.join('\n\n');
 }
