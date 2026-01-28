@@ -106,12 +106,12 @@ export async function fetchTripPlanningCompanies(): Promise<Record<string, Compa
     const results = await Promise.allSettled(promises);
 
     // Process results, handling failures gracefully
-    for (const result of results) {
-      if (result.status === 'fulfilled') {
-        const { category, companies } = result.value;
+    for (const settledResult of results) {
+      if (settledResult.status === 'fulfilled') {
+        const { category, companies } = settledResult.value;
         result[category] = companies;
       } else {
-        console.warn(`Failed to fetch ${result.reason?.toString()}`);
+        console.warn(`Failed to fetch ${settledResult.reason?.toString()}`);
       }
     }
 
