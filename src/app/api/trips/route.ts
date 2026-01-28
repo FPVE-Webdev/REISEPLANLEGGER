@@ -69,8 +69,9 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    // Persist to database
+    // Persist to database (optional - if it fails, we still return the plan)
     let tripPlan;
+    let persistenceError: Error | null = null;
     try {
       tripPlan = await prisma.tripPlan.create({
         data: {
@@ -84,7 +85,18 @@ export async function POST(request: NextRequest) {
       addBreadcrumb('Trip plan persisted to database', { id: tripPlan.id });
     } catch (error) {
       tagError('database');
-      throw error;
+      persistenceError = error instanceof Error ? error : new Error(String(error));
+      console.error('[Trip Plan API] Database persistence failed, but returning plan:', persistenceError.message);
+      // Create a temporary response object without database persistence
+      tripPlan = {
+        id: cuid(),
+        shareableId: cuid(),
+        preferences: preferences as any,
+        plan: plan as any,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
     }
 
     const response: TripPlanResponse & { id: string; shareableId: string } = {

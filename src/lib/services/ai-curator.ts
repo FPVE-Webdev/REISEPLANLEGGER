@@ -50,11 +50,18 @@ export async function generateTripPlan(input: GenerateTripPlanInput): Promise<Tr
     console.error('[AI Curator] Error calling OpenAI API:', error instanceof Error ? error.message : error);
   }
 
-  // Fallback: Generate plan using rule-based system
-  const context = buildAIContext(preferences, season);
-  const plan = await generatePlanWithRules(preferences, season, startDate, context);
-
-  return plan;
+  // Fallback: Generate plan using rule-based system with protection
+  try {
+    const context = buildAIContext(preferences, season);
+    const plan = await generatePlanWithRules(preferences, season, startDate, context);
+    console.log('[AI Curator] Successfully generated trip plan using rule-based system');
+    return plan;
+  } catch (error) {
+    console.error('[AI Curator] Rule-based generation failed:', error instanceof Error ? error.message : error);
+    throw new Error(
+      `Trip plan generation failed: ${error instanceof Error ? error.message : 'Unknown error occurred'}`
+    );
+  }
 }
 
 /**

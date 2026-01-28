@@ -70,14 +70,18 @@ export function handleApiError(
     ...(includeStack && error instanceof Error && { stack: error.stack }),
   });
 
-  // Return error response
+  // Return error response with meaningful error details
+  const responseError =
+    statusCode === 500
+      ? process.env.NODE_ENV === 'development'
+        ? errorMessage // Show full error in development
+        : 'An error occurred processing your request' // Generic message in production
+      : errorMessage;
+
   return NextResponse.json(
     {
       success: false,
-      error:
-        statusCode === 500
-          ? 'An error occurred processing your request'
-          : errorMessage,
+      error: responseError,
     },
     { status: statusCode }
   );
