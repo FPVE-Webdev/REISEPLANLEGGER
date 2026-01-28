@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { TripPreferences, TripPlanResponse } from '@/types/trip';
 import { generateTripPlan } from '@/lib/services/ai-curator';
 import { getSeasonFromDate } from '@/lib/constants/seasons';
+import { prisma } from '@/lib/db';
+import cuid from 'cuid';
 
 /**
  * POST /api/trips
- * Generate a personalized trip plan based on user preferences
+ * Generate a personalized trip plan and persist to database
  */
 export async function POST(request: NextRequest) {
   try {
@@ -47,7 +49,18 @@ export async function POST(request: NextRequest) {
       startDate,
     });
 
-    const response: TripPlanResponse = {
+    // Persist to database
+    const tripPlan = await prisma.tripPlan.create({
+      data: {
+        id: cuid(),
+        shareableId: cuid(),
+        preferences: preferences as any, // Prisma Json type accepts any
+        plan: plan as any, // Prisma Json type accepts any
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      },
+    });
+
+    const response: TripPlanResponse & { id: string; shareableId: string } = {
       plan,
       preferences,
       generatedAt: new Date().toISOString(),
@@ -55,9 +68,11 @@ export async function POST(request: NextRequest) {
         companiesAvailable: 0, // TODO: Count from database
         guidesAvailable: 0, // TODO: Count from database
       },
+      id: tripPlan.id,
+      shareableId: tripPlan.shareableId,
     };
 
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
     console.error('Error generating trip plan:', error);
 
@@ -69,16 +84,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-/**
- * GET /api/trips/[id]
- * Retrieve a previously generated trip plan (future: save to database)
- */
-export async function GET(request: NextRequest) {
-  // TODO: Implement trip plan retrieval from database
-  return NextResponse.json(
-    { success: false, error: 'Not implemented yet' },
-    { status: 501 }
-  );
 }
