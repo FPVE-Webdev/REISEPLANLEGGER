@@ -80,7 +80,7 @@ export function useTripPlanner() {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://tromso.ai';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
       const response = await fetch(`${apiUrl}/api/trips`, {
         method: 'POST',
         headers: {
