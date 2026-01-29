@@ -162,7 +162,9 @@ export async function fetchCompaniesCached(params?: CompanyQueryParams): Promise
   // Check cache
   const cached = companiesCache.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    console.log('[Company Client] Returning cached companies');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Company Client] Returning cached companies');
+    }
     return cached.data;
   }
 
@@ -184,5 +186,7 @@ export async function fetchCompaniesCached(params?: CompanyQueryParams): Promise
  */
 export function clearCompaniesCache(): void {
   companiesCache.clear();
-  console.log('[Company Client] Cache cleared');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Company Client] Cache cleared');
+  }
 }

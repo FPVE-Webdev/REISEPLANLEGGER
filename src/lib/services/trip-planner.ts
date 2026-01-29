@@ -68,6 +68,58 @@ export interface TripPlan {
   importantNotes: string[]
 }
 
+// Interfaces for raw JSON parsing from OpenAI API
+interface ParsedActivity {
+  time?: string
+  activity?: string
+  notes?: string
+}
+
+interface ParsedDay {
+  date: string
+  theme?: string
+  activities?: ParsedActivity[]
+  auroraTime?: string
+  auroraViewing?: boolean
+  totalCost?: number
+  dayRating?: number
+}
+
+interface ParsedTripPlan {
+  title: string
+  summary: string
+  days: ParsedDay[]
+  totalCost?: number
+  highlights?: unknown[]
+  recommendations?: unknown[]
+  importantNotes?: unknown[]
+}
+
+// Simplified activity structure for parsed responses
+interface SimplifiedDayPlan {
+  date: string
+  theme?: string
+  activities: Array<{
+    time: string
+    activity: string
+    notes: string
+  }>
+  auroraTime?: string
+  auroraViewing: boolean
+  totalCost?: number
+  dayRating?: number
+}
+
+interface SimplifiedTripPlan {
+  title: string
+  summary: string
+  days: SimplifiedDayPlan[]
+  totalCost?: number
+  highlights: string[]
+  recommendations: string[]
+  importantNotes: string[]
+}
+
 // ============================================================================
 // DATA SOURCES
 // ============================================================================
@@ -323,7 +375,7 @@ export class TripplanCurator {
         return null
       }
 
-      const json = JSON.parse(jsonMatch[0])
+      const json = JSON.parse(jsonMatch[0]) as ParsedTripPlan
 
       // Validate structure
       if (
@@ -339,10 +391,10 @@ export class TripplanCurator {
       return {
         title: json.title.substring(0, 100),
         summary: json.summary.substring(0, 300),
-        days: json.days.slice(0, 30).map((day: any) => ({
+        days: json.days.slice(0, 30).map((day: ParsedDay) => ({
           date: day.date,
           theme: day.theme?.substring(0, 50),
-          activities: (day.activities || []).slice(0, 5).map((a: any) => ({
+          activities: (day.activities || []).slice(0, 5).map((a: ParsedActivity) => ({
             time: a.time?.substring(0, 20) || '09:00',
             activity: a.activity?.substring(0, 100) || 'Activity',
             notes: a.notes?.substring(0, 200) || '',
@@ -352,13 +404,13 @@ export class TripplanCurator {
           totalCost: day.totalCost,
           dayRating: day.dayRating,
         })),
-        highlights: (json.highlights || []).slice(0, 5).map((h: any) => String(h).substring(0, 100)),
-        recommendations: (json.recommendations || []).slice(0, 5).map((r: any) => String(r).substring(0, 150)),
-        importantNotes: (json.importantNotes || []).slice(0, 5).map((n: any) => String(n).substring(0, 150)),
+        highlights: (json.highlights || []).slice(0, 5).map((h: unknown) => String(h).substring(0, 100)),
+        recommendations: (json.recommendations || []).slice(0, 5).map((r: unknown) => String(r).substring(0, 150)),
+        importantNotes: (json.importantNotes || []).slice(0, 5).map((n: unknown) => String(n).substring(0, 150)),
         totalCost: json.totalCost,
-      }
-    } catch (error: any) {
-      console.error(`[Tripplan] Parse error: ${error.message}`)
+      } as unknown as TripPlan
+    } catch (error) {
+      console.error(`[Tripplan] Parse error: ${error instanceof Error ? error.message : 'Unknown error'}`)
       return null
     }
   }
@@ -459,7 +511,9 @@ export async function createTripplan(
 
     // Fallback to rule-based
     if (options?.useFallback !== false) {
-      console.log('[Tripplan] AI plan generation failed, using fallback')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Tripplan] AI plan generation failed, using fallback')
+      }
       return curator.planFallback(request)
     }
 

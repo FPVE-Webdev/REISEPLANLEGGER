@@ -52,12 +52,16 @@ export async function generateTripPlan(input: GenerateTripPlanInput): Promise<Tr
     });
 
     if (aiPlan) {
-      console.log('[AI Curator] Successfully generated trip plan using OpenAI GPT-4');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[AI Curator] Successfully generated trip plan using OpenAI GPT-4');
+      }
       return aiPlan;
     }
 
     // If AI call returns null, fall back to rule-based generation
-    console.log('[AI Curator] OpenAI API failed or returned invalid response, using rule-based generation');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AI Curator] OpenAI API failed or returned invalid response, using rule-based generation');
+    }
   } catch (error) {
     console.error('[AI Curator] Error calling OpenAI API:', error instanceof Error ? error.message : error);
   }
@@ -66,7 +70,9 @@ export async function generateTripPlan(input: GenerateTripPlanInput): Promise<Tr
   try {
     const context = buildAIContext(preferences, season);
     const plan = await generatePlanWithRules(preferences, season, startDate, context);
-    console.log('[AI Curator] Successfully generated trip plan using rule-based system');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AI Curator] Successfully generated trip plan using rule-based system');
+    }
     return plan;
   } catch (error) {
     console.error('[AI Curator] Rule-based generation failed:', error instanceof Error ? error.message : error);

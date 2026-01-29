@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import type { TripPreferences, TripPlanResponse } from '@/types/trip';
 import { generateTripPlan } from '@/lib/services/ai-curator';
 import { getSeasonFromDate } from '@/lib/constants/seasons';
@@ -77,8 +78,8 @@ export async function POST(request: NextRequest) {
         data: {
           id: cuid(),
           shareableId: cuid(),
-          preferences: preferences as any, // Prisma Json type accepts any
-          plan: plan as any, // Prisma Json type accepts any
+          preferences: preferences as unknown as Prisma.JsonObject,
+          plan: plan as unknown as Prisma.JsonObject,
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
         },
       });
@@ -91,8 +92,8 @@ export async function POST(request: NextRequest) {
       tripPlan = {
         id: cuid(),
         shareableId: cuid(),
-        preferences: preferences as any,
-        plan: plan as any,
+        preferences: preferences as unknown as Prisma.JsonObject,
+        plan: plan as unknown as Prisma.JsonObject,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
