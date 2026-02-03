@@ -19,7 +19,7 @@ export function PlanSummary({ plan }: PlanSummaryProps) {
     <div className="space-y-6">
       {/* Summary Text */}
       <div className="bg-arctic-800 rounded-2xl p-6 border border-arctic-700">
-        <h2 className="text-xl font-bold mb-3">Din personlige turplan</h2>
+        <h2 className="text-xl font-bold mb-3">Your personalized trip plan</h2>
         <p className="text-foreground/90 leading-relaxed">{plan.summary}</p>
       </div>
 
@@ -34,22 +34,22 @@ export function PlanSummary({ plan }: PlanSummaryProps) {
 
         <div className="bg-arctic-800 rounded-xl p-4 border border-arctic-700">
           <div className="text-3xl font-bold text-primary mb-1">
-            {plan.totalCost.toLocaleString('no-NO')}
+            {plan.totalCost.toLocaleString('en-US')}
           </div>
-          <div className="text-sm text-muted-foreground">NOK totalt</div>
+          <div className="text-sm text-muted-foreground">NOK total</div>
         </div>
 
         <div className="bg-arctic-800 rounded-xl p-4 border border-arctic-700">
           <div className="text-3xl font-bold text-primary mb-1">{totalActivities}</div>
           <div className="text-sm text-muted-foreground">
-            {totalActivities === 1 ? 'Aktivitet' : 'Aktiviteter'}
+            {totalActivities === 1 ? 'Activity' : 'Activities'}
           </div>
         </div>
 
         <div className="bg-arctic-800 rounded-xl p-4 border border-arctic-700">
           <div className="text-3xl font-bold text-primary mb-1">{auroraOpportunities}</div>
           <div className="text-sm text-muted-foreground">
-            Nordlys-{auroraOpportunities === 1 ? 'mulighet' : 'muligheter'}
+            Aurora {auroraOpportunities === 1 ? 'opportunity' : 'opportunities'}
           </div>
         </div>
       </div>

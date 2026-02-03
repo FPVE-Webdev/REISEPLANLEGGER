@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
 
   return (
-    <html lang="no" className={syne.variable}>
+    <html lang="en" className={syne.variable}>
       <body className="font-sans antialiased">
         <RootLayoutClient>{children}</RootLayoutClient>
       </body>

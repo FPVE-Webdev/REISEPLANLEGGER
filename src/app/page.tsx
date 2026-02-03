@@ -13,7 +13,7 @@ export default function HomePage() {
           Tripplan Tromsø
         </p>
         <p className="text-lg text-gray-600 max-w-md mx-auto">
-          Vi jobber med noe spennende. Hold deg oppdatert!
+          We're working on something exciting. Stay tuned!
         </p>
       </div>
     </main>

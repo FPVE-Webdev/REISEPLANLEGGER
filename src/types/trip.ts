@@ -113,38 +113,38 @@ export interface InterestMetadata {
 }
 
 export const INTEREST_METADATA: Record<Interest, Omit<InterestMetadata, 'id'>> = {
-  aurora: { label: 'Nordlys', emoji: '🌌', description: 'Northern lights viewing' },
-  dining: { label: 'Mat & Drikke', emoji: '🍽️', description: 'Local cuisine' },
-  snowmobile: { label: 'Snøscooter', emoji: '🛷', description: 'Snowmobile tours' },
-  husky: { label: 'Hundekjøring', emoji: '🐕', description: 'Husky sledding' },
-  reindeer: { label: 'Reinsdyr', emoji: '🦌', description: 'Reindeer experiences' },
-  fishing: { label: 'Fiske', emoji: '🎣', description: 'Fishing trips' },
-  culture: { label: 'Kultur', emoji: '🏛️', description: 'Cultural activities' },
-  nature: { label: 'Natur', emoji: '🏔️', description: 'Nature exploration' },
-  photography: { label: 'Fotografi', emoji: '📸', description: 'Photography tours' },
-  'whale-watching': { label: 'Hvalfangst', emoji: '🐋', description: 'Whale watching' },
-  hiking: { label: 'Fotturer', emoji: '🥾', description: 'Hiking trails' },
+  aurora: { label: 'Aurora', emoji: '🌌', description: 'Northern lights viewing' },
+  dining: { label: 'Dining', emoji: '🍽️', description: 'Local cuisine' },
+  snowmobile: { label: 'Snowmobile', emoji: '🛷', description: 'Snowmobile tours' },
+  husky: { label: 'Dog sledding', emoji: '🐕', description: 'Husky sledding' },
+  reindeer: { label: 'Reindeer', emoji: '🦌', description: 'Reindeer experiences' },
+  fishing: { label: 'Fishing', emoji: '🎣', description: 'Fishing trips' },
+  culture: { label: 'Culture', emoji: '🏛️', description: 'Cultural activities' },
+  nature: { label: 'Nature', emoji: '🏔️', description: 'Nature exploration' },
+  photography: { label: 'Photography', emoji: '📸', description: 'Photography tours' },
+  'whale-watching': { label: 'Whale watching', emoji: '🐋', description: 'Whale watching' },
+  hiking: { label: 'Hiking', emoji: '🥾', description: 'Hiking trails' },
   wellness: { label: 'Wellness', emoji: '🧘', description: 'Spa & relaxation' },
   shopping: { label: 'Shopping', emoji: '🛍️', description: 'Local shopping' },
-  skiing: { label: 'Ski', emoji: '⛷️', description: 'Skiing activities' },
+  skiing: { label: 'Skiing', emoji: '⛷️', description: 'Skiing activities' },
 };
 
 // Budget Display Metadata
 export const BUDGET_METADATA: Record<BudgetLevel, { label: string; amount: string; description: string }> = {
-  low: { label: 'Lavt', amount: '800 NOK/dag', description: 'Budsjettvenlig' },
-  medium: { label: 'Middels', amount: '1500 NOK/dag', description: 'Balansert' },
-  high: { label: 'Høyt', amount: '3000+ NOK/dag', description: 'Premium opplevelser' },
+  low: { label: 'Budget', amount: '800 NOK/day', description: 'Budget-friendly' },
+  medium: { label: 'Moderate', amount: '1500 NOK/day', description: 'Balanced' },
+  high: { label: 'Premium', amount: '3000+ NOK/day', description: 'Premium experiences' },
 };
 
 // Difficulty Display Metadata
 export const DIFFICULTY_METADATA: Record<DifficultyLevel, { label: string; description: string }> = {
-  easy: { label: 'Lett', description: 'Rolig tempo, minimal fysisk aktivitet' },
-  moderate: { label: 'Moderat', description: 'Balansert mellom aktivitet og hvile' },
-  active: { label: 'Aktiv', description: 'Høyt tempo, mye fysisk aktivitet' },
+  easy: { label: 'Easy', description: 'Relaxed pace, minimal physical activity' },
+  moderate: { label: 'Moderate', description: 'Balanced between activity and rest' },
+  active: { label: 'Active', description: 'Fast pace, lots of physical activity' },
 };
 
 // Transport Display Metadata
 export const TRANSPORT_METADATA: Record<TransportMode, { label: string; description: string }> = {
-  car: { label: 'Med bil', description: 'Fleksibilitet til å utforske' },
-  'no-car': { label: 'Uten bil', description: 'Offentlig transport og turer' },
+  car: { label: 'With car', description: 'Flexibility to explore' },
+  'no-car': { label: 'Without car', description: 'Public transport and tours' },
 };

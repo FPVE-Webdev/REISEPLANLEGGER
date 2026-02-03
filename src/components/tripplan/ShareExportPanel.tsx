@@ -24,7 +24,7 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
       setTimeout(() => setCopied(false), 3000);
     } catch (error) {
       console.error('Failed to copy link:', error);
-      alert('Kunne ikke kopiere lenke. Prøv igjen.');
+      alert('Failed to copy link. Try again.');
     } finally {
       setGenerating(false);
     }
@@ -36,7 +36,7 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
       downloadFile(icsContent, 'tromso-trip.ics', 'text/calendar');
     } catch (error) {
       console.error('Failed to export calendar:', error);
-      alert('Kunne ikke eksportere til kalender. Prøv igjen.');
+      alert('Failed to export to calendar. Try again.');
     }
   };
 
@@ -47,7 +47,7 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
       downloadFile(pdfBlob, 'tromso-trip-plan.pdf', 'application/pdf');
     } catch (error) {
       console.error('Failed to export PDF:', error);
-      alert('Kunne ikke eksportere PDF. Prøv igjen.');
+      alert('Failed to export PDF. Try again.');
     } finally {
       setGenerating(false);
     }
@@ -81,7 +81,7 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
       console.error('Failed to save plan:', error);
-      alert('Kunne ikke lagre turplan. Prøv igjen.');
+      alert('Failed to save trip plan. Try again.');
     }
   };
 
@@ -89,9 +89,9 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
     <div className="space-y-6">
       {/* Info Card */}
       <div className="bg-arctic-800 rounded-2xl p-6 border border-arctic-700">
-        <h3 className="text-lg font-semibold mb-2">Del eller lagre turplanen din</h3>
+        <h3 className="text-lg font-semibold mb-2">Share or save your trip plan</h3>
         <p className="text-sm text-muted-foreground">
-          Lagre turplanen lokalt, skriv den ut, eller del lenken med andre.
+          Save the trip plan locally, print it, or share the link with others.
         </p>
       </div>
 
@@ -125,9 +125,9 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
             )}
           </div>
           <div className="text-center">
-            <div className="font-semibold mb-1">{copied ? 'Kopiert!' : 'Kopier lenke'}</div>
+            <div className="font-semibold mb-1">{copied ? 'Copied!' : 'Copy link'}</div>
             <div className="text-xs text-muted-foreground">
-              {copied ? 'Lenken er kopiert' : 'Del med venner og familie'}
+              {copied ? 'Link copied' : 'Share with friends and family'}
             </div>
           </div>
         </button>
@@ -152,8 +152,8 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
             </svg>
           </div>
           <div className="text-center">
-            <div className="font-semibold mb-1">Skriv ut</div>
-            <div className="text-xs text-muted-foreground">Print turplanen</div>
+            <div className="font-semibold mb-1">Print</div>
+            <div className="text-xs text-muted-foreground">Print the trip plan</div>
           </div>
         </button>
 
@@ -185,9 +185,9 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
             )}
           </div>
           <div className="text-center">
-            <div className="font-semibold mb-1">{saved ? 'Lagret!' : 'Lagre lokalt'}</div>
+            <div className="font-semibold mb-1">{saved ? 'Saved!' : 'Save locally'}</div>
             <div className="text-xs text-muted-foreground">
-              {saved ? 'Turplan lagret' : 'Lagre i nettleseren'}
+              {saved ? 'Trip plan saved' : 'Save in browser'}
             </div>
           </div>
         </button>
@@ -215,8 +215,8 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
             </svg>
           </div>
           <div className="text-center">
-            <div className="font-semibold mb-1">Eksporter til kalender</div>
-            <div className="text-xs text-muted-foreground">Last ned .ics fil</div>
+            <div className="font-semibold mb-1">Export to calendar</div>
+            <div className="text-xs text-muted-foreground">Download .ics file</div>
           </div>
         </button>
 
@@ -253,9 +253,9 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
             )}
           </div>
           <div className="text-center">
-            <div className="font-semibold mb-1">{generating ? 'Genererer...' : 'Last ned PDF'}</div>
+            <div className="font-semibold mb-1">{generating ? 'Generating...' : 'Download PDF'}</div>
             <div className="text-xs text-muted-foreground">
-              {generating ? 'Vennligst vent' : 'Fullt detaljert turplan'}
+              {generating ? 'Please wait' : 'Fully detailed trip plan'}
             </div>
           </div>
         </button>
@@ -265,20 +265,20 @@ export function ShareExportPanel({ plan }: ShareExportPanelProps) {
       <div className="bg-arctic-800/50 rounded-2xl p-6 border border-arctic-700 border-dashed">
         <h4 className="font-semibold mb-2 flex items-center gap-2">
           <span>🚀</span>
-          Kommer snart
+          Coming soon
         </h4>
         <ul className="space-y-1 text-sm text-muted-foreground">
           <li className="flex items-center gap-2">
             <span className="text-primary">•</span>
-            Del på sosiale medier (Facebook, Twitter, Email)
+            Share on social media (Facebook, Twitter, Email)
           </li>
           <li className="flex items-center gap-2">
             <span className="text-primary">•</span>
-            Direkte booking av aktiviteter og restauranter
+            Direct booking of activities and restaurants
           </li>
           <li className="flex items-center gap-2">
             <span className="text-primary">•</span>
-            Lagre flere turplaner og sammenligne
+            Save and compare multiple trip plans
           </li>
         </ul>
       </div>

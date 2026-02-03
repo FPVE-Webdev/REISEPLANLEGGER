@@ -59,12 +59,12 @@ export function TripPreferencesForm({
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm text-muted-foreground">
-            Steg {currentStepIndex + 1} av {totalSteps}
+            Step {currentStepIndex + 1} of {totalSteps}
           </p>
           <p className="text-sm text-primary font-medium">
-            {step === 'basic' && 'Grunnleggende'}
-            {step === 'interests' && 'Interesser'}
-            {step === 'details' && 'Detaljer'}
+            {step === 'basic' && 'Basics'}
+            {step === 'interests' && 'Interests'}
+            {step === 'details' && 'Details'}
           </p>
         </div>
         <div className="w-full bg-arctic-700 rounded-full h-2">
@@ -80,16 +80,16 @@ export function TripPreferencesForm({
         {step === 'basic' && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold mb-2">La oss planlegge turen din!</h2>
+              <h2 className="text-2xl font-bold mb-2">Let's plan your trip!</h2>
               <p className="text-muted-foreground">
-                Fortell oss litt om reisen du ønsker å planlegge
+                Tell us a bit about the adventure you want to plan
               </p>
             </div>
 
             {/* Start Date */}
             <div>
               <label htmlFor="startDate" className="block text-sm font-medium mb-2">
-                Startdato (valgfritt)
+                Start date (optional)
               </label>
               <input
                 type="date"
@@ -108,7 +108,7 @@ export function TripPreferencesForm({
             {/* Number of Days */}
             <div>
               <label htmlFor="days" className="block text-sm font-medium mb-2">
-                Antall dager: {preferences.days || 3}
+                Number of days: {preferences.days || 3}
               </label>
               <input
                 type="range"
@@ -120,15 +120,15 @@ export function TripPreferencesForm({
                 className="w-full h-2 bg-arctic-700 rounded-lg appearance-none cursor-pointer accent-primary"
               />
               <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>1 dag</span>
-                <span>14 dager</span>
+                <span>1 day</span>
+                <span>14 days</span>
               </div>
             </div>
 
             {/* Group Size */}
             <div>
               <label htmlFor="groupSize" className="block text-sm font-medium mb-2">
-                Antall personer
+                Number of people
               </label>
               <input
                 type="number"
@@ -151,8 +151,8 @@ export function TripPreferencesForm({
         {step === 'interests' && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Hva interesserer deg?</h2>
-              <p className="text-muted-foreground">Velg minst én interesse (kan velge flere)</p>
+              <h2 className="text-2xl font-bold mb-2">What interests you?</h2>
+              <p className="text-muted-foreground">Choose at least one interest (you can select multiple)</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -183,7 +183,7 @@ export function TripPreferencesForm({
 
             {preferences.interests && preferences.interests.length > 0 && (
               <p className="text-sm text-primary text-center">
-                ✓ {preferences.interests.length} interesse{preferences.interests.length > 1 ? 'r' : ''} valgt
+                ✓ {preferences.interests.length} interest{preferences.interests.length > 1 ? 's' : ''} selected
               </p>
             )}
           </div>
@@ -192,13 +192,13 @@ export function TripPreferencesForm({
         {step === 'details' && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Siste detaljer</h2>
-              <p className="text-muted-foreground">Tilpass turen til dine behov</p>
+              <h2 className="text-2xl font-bold mb-2">Final details</h2>
+              <p className="text-muted-foreground">Customize the trip to your needs</p>
             </div>
 
             {/* Budget */}
             <div>
-              <label className="block text-sm font-medium mb-3">Budsjett per dag</label>
+              <label className="block text-sm font-medium mb-3">Daily budget</label>
               <div className="space-y-2">
                 {(Object.keys(BUDGET_METADATA) as Array<keyof typeof BUDGET_METADATA>).map((level) => {
                   const meta = BUDGET_METADATA[level];
@@ -231,7 +231,7 @@ export function TripPreferencesForm({
 
             {/* Transport */}
             <div>
-              <label className="block text-sm font-medium mb-3">Transport</label>
+              <label className="block text-sm font-medium mb-3">Transportation</label>
               <div className="grid grid-cols-2 gap-3">
                 {(Object.keys(TRANSPORT_METADATA) as Array<keyof typeof TRANSPORT_METADATA>).map((mode) => {
                   const meta = TRANSPORT_METADATA[mode];
@@ -260,7 +260,7 @@ export function TripPreferencesForm({
 
             {/* Difficulty */}
             <div>
-              <label className="block text-sm font-medium mb-3">Aktivitetsnivå</label>
+              <label className="block text-sm font-medium mb-3">Activity level</label>
               <div className="space-y-2">
                 {(Object.keys(DIFFICULTY_METADATA) as Array<keyof typeof DIFFICULTY_METADATA>).map(
                   (level) => {
@@ -307,7 +307,7 @@ export function TripPreferencesForm({
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
-            Tilbake
+            Back
           </button>
         )}
         {!isLastStep ? (
@@ -322,7 +322,7 @@ export function TripPreferencesForm({
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
-            Neste
+            Next
           </button>
         ) : (
           <button
@@ -340,10 +340,10 @@ export function TripPreferencesForm({
             {loading ? (
               <>
                 <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Genererer turplan...
+                Generating trip plan...
               </>
             ) : (
-              'Generer turplan'
+              'Generate trip plan'
             )}
           </button>
         )}

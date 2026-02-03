@@ -8,7 +8,7 @@ interface DayCardProps {
 }
 
 export function DayCard({ day }: DayCardProps) {
-  const formattedDate = new Date(day.date).toLocaleDateString('no-NO', {
+  const formattedDate = new Date(day.date).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -21,7 +21,7 @@ export function DayCard({ day }: DayCardProps) {
       <div className="bg-gradient-to-r from-primary/20 to-accent/20 px-6 py-4 border-b border-arctic-700">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-2xl font-bold text-primary">Dag {day.day}</h3>
+            <h3 className="text-2xl font-bold text-primary">Day {day.day}</h3>
             <p className="text-sm text-foreground/80 capitalize">{formattedDate}</p>
           </div>
           {day.theme && (
@@ -54,7 +54,7 @@ export function DayCard({ day }: DayCardProps) {
                   </div>
                   {activity.cost > 0 && (
                     <div className="text-sm font-medium text-primary whitespace-nowrap">
-                      {activity.cost.toLocaleString('no-NO')} NOK
+                      {activity.cost.toLocaleString('en-US')} NOK
                     </div>
                   )}
                 </div>
@@ -105,7 +105,7 @@ export function DayCard({ day }: DayCardProps) {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <span>Booking påkrevd</span>
+                      <span>Booking required</span>
                     </div>
                   )}
                 </div>
@@ -119,18 +119,18 @@ export function DayCard({ day }: DayCardProps) {
           <div className="border-t border-arctic-700 pt-4 mb-4">
             <h4 className="font-semibold mb-3 flex items-center gap-2">
               <span className="text-xl">🍽️</span>
-              Mat
+              Food
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {day.dining.lunch && (
                 <div className="bg-arctic-700/50 rounded-lg p-3">
-                  <div className="text-xs text-muted-foreground mb-1">Lunsj</div>
+                  <div className="text-xs text-muted-foreground mb-1">Lunch</div>
                   <div className="font-medium">{day.dining.lunch}</div>
                 </div>
               )}
               {day.dining.dinner && (
                 <div className="bg-arctic-700/50 rounded-lg p-3">
-                  <div className="text-xs text-muted-foreground mb-1">Middag</div>
+                  <div className="text-xs text-muted-foreground mb-1">Dinner</div>
                   <div className="font-medium">{day.dining.dinner}</div>
                 </div>
               )}
@@ -144,14 +144,14 @@ export function DayCard({ day }: DayCardProps) {
             <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg p-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <span className="text-xl">🌌</span>
-                Nordlysmulighet
+                Aurora chance
               </h4>
 
               <div className="space-y-3">
                 {/* Probability Meter */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-muted-foreground">Sannsynlighet</span>
+                    <span className="text-sm text-muted-foreground">Probability</span>
                     <span className="text-sm font-semibold text-primary">
                       {day.aurora.probability}%
                     </span>
@@ -173,11 +173,11 @@ export function DayCard({ day }: DayCardProps) {
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <div className="text-muted-foreground mb-1">Beste tid</div>
+                    <div className="text-muted-foreground mb-1">Best time</div>
                     <div className="font-medium">{day.aurora.bestTime}</div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground mb-1">Anbefalt sted</div>
+                    <div className="text-muted-foreground mb-1">Recommended location</div>
                     <div className="font-medium">{day.aurora.location}</div>
                   </div>
                 </div>

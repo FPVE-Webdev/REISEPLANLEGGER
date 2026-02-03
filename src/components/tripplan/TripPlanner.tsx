@@ -41,7 +41,7 @@ export function TripPlanner() {
             <div>
               <h1 className="text-2xl font-bold text-primary">AI Trip Planner</h1>
               <p className="text-sm text-muted-foreground">
-                Plan din perfekte Tromsø-opplevelse
+                Plan your perfect Tromsø experience
               </p>
             </div>
             {plan && (
@@ -53,7 +53,7 @@ export function TripPlanner() {
                   'hover:bg-arctic-600 transition-colors'
                 )}
               >
-                Ny turplan
+                New trip plan
               </button>
             )}
           </div>
@@ -83,9 +83,9 @@ export function TripPlanner() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 mb-4">
                 <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Genererer din personlige turplan...</h3>
+              <h3 className="text-lg font-semibold mb-2">Generating your personalized trip plan...</h3>
               <p className="text-sm text-muted-foreground">
-                Dette tar vanligvis 10-15 sekunder
+                This usually takes 10-15 seconds
               </p>
             </div>
           </div>
@@ -123,7 +123,7 @@ export function TripPlanner() {
                     : 'bg-arctic-800 text-foreground hover:bg-arctic-700'
                 )}
               >
-                📅 Reiseplan
+                📅 Itinerary
               </button>
               <button
                 onClick={() => setActiveTab('packing')}
@@ -134,7 +134,7 @@ export function TripPlanner() {
                     : 'bg-arctic-800 text-foreground hover:bg-arctic-700'
                 )}
               >
-                🎒 Pakkeliste
+                🎒 Packing list
               </button>
               <button
                 onClick={() => setActiveTab('share')}
@@ -145,7 +145,7 @@ export function TripPlanner() {
                     : 'bg-arctic-800 text-foreground hover:bg-arctic-700'
                 )}
               >
-                📤 Del & Eksporter
+                📤 Share & Export
               </button>
             </div>
 

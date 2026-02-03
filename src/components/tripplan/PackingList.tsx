@@ -18,11 +18,11 @@ const CATEGORY_ICONS: Record<PackingCategory, string> = {
 };
 
 const CATEGORY_LABELS: Record<PackingCategory, string> = {
-  klær: 'Klær',
-  teknologi: 'Teknologi',
-  helse: 'Helse',
-  dokumenter: 'Dokumenter',
-  aktiviteter: 'Aktiviteter',
+  klær: 'Clothing',
+  teknologi: 'Technology',
+  helse: 'Health',
+  dokumenter: 'Documents',
+  aktiviteter: 'Activities',
 };
 
 function categorizeItem(item: string): PackingCategory {
@@ -169,7 +169,7 @@ export function PackingList({ items, planId = 'default' }: PackingListProps) {
       {/* Progress */}
       <div className="bg-arctic-800 rounded-2xl p-6 border border-arctic-700">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold">Pakkeliste fremgang</h3>
+          <h3 className="text-lg font-semibold">Packing list progress</h3>
           <span className="text-sm font-medium text-primary">
             {checkedItems} / {totalItems}
           </span>
@@ -180,7 +180,7 @@ export function PackingList({ items, planId = 'default' }: PackingListProps) {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-sm text-muted-foreground mt-2">{progress}% pakket</p>
+        <p className="text-sm text-muted-foreground mt-2">{progress}% packed</p>
       </div>
 
       {/* Categories */}
@@ -242,8 +242,8 @@ export function PackingList({ items, planId = 'default' }: PackingListProps) {
       {progress === 100 && (
         <div className="bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl p-6 border border-primary/30 text-center">
           <div className="text-4xl mb-2">🎉</div>
-          <p className="font-semibold text-lg">Alt er pakket!</p>
-          <p className="text-sm text-muted-foreground mt-1">Du er klar for turen</p>
+          <p className="font-semibold text-lg">All packed!</p>
+          <p className="text-sm text-muted-foreground mt-1">You're ready for the trip</p>
         </div>
       )}
     </div>
